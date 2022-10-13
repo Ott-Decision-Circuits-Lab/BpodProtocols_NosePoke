@@ -8,16 +8,18 @@ global nidaq
 TaskParameters = GUISetup();  % Set experiment parameters in GUISetup.m
 
 InitializeCustomDataFields(); % Initialize data (trial type) vectors and first values
+LoadWaveformToWavePlayer(); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
 
 % ------------------------Setup Stimuli--------------------------------%
-if ~BpodSystem.EmulatorMode
-    [Player, fs] = SetupWavePlayer();
-    PunishSound = rand(1, fs*.5)*2 - 1;  % white noise
-    SoundIndex=1;
-    Player.loadWaveform(SoundIndex, PunishSound);
-    SoundChannels = [3];  % Array of channels for each sound: play on left (1), right (2), or both (3)
-    LoadSoundMessages(SoundChannels);
-end
+% if ~BpodSystem.EmulatorMode
+%     [Player, fs] = SetupWavePlayer();
+%     PunishSound = rand(1, fs*TaskParameters.GUI.EarlyWithdrawalTimeOut)*2 - 1;  % white noise
+%     % PunishSound = GeneratePoissonClickTrain(20, TaskParameters.GUI.SampleTime, fs, 5);
+%     SoundIndex=1;
+%     Player.loadWaveform(SoundIndex, PunishSound);
+%     SoundChannels = [3];  % Array of channels for each sound: play on left (1), right (2), or both (3)
+%     LoadSoundMessages(SoundChannels);
+% end
 % ---------------------------------------------------------------------%
 
 BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
@@ -100,6 +102,8 @@ while RunSession
     
     % update fields
     UpdateCustomDataFields(iTrial);
+    LoadWaveformToWavePlayer(); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
+    
     SaveBpodSessionData();
     
     % update figures

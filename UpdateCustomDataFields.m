@@ -70,19 +70,19 @@ end
 
 % correct/error?
 BpodSystem.Data.Custom.TrialData.Correct(iTrial) = true; %any choice is correct
-    if TaskParameters.GUI.LightGuided
-        if BpodSystem.Data.Custom.TrialData.LightLeft(iTrial)==1 && BpodSystem.Data.Custom.TrialData.ChoiceLeft(iTrial)==1
-            BpodSystem.Data.Custom.TrialData.Correct(iTrial) = true;
-        elseif BpodSystem.Data.Custom.TrialData.LightLeft(iTrial)==0 && BpodSystem.Data.Custom.TrialData.ChoiceLeft(iTrial)==0
-            BpodSystem.Data.Custom.TrialData.Correct(iTrial) = true;
-        elseif BpodSystem.Data.Custom.TrialData.LightLeft(iTrial)==1 && BpodSystem.Data.Custom.TrialData.ChoiceLeft(iTrial)==0
-            BpodSystem.Data.Custom.TrialData.Correct(iTrial) = false;
-        elseif BpodSystem.Data.Custom.TrialData.LightLeft(iTrial)==0 && BpodSystem.Data.Custom.TrialData.ChoiceLeft(iTrial)==1
-            BpodSystem.Data.Custom.TrialData.Correct(iTrial) = false;
-        end
-    else
-    BpodSystem.Data.Custom.TrialData.Correct(iTrial) = true;
+if TaskParameters.GUI.LightGuided
+    if BpodSystem.Data.Custom.TrialData.LightLeft(iTrial)==1 && BpodSystem.Data.Custom.TrialData.ChoiceLeft(iTrial)==1
+        BpodSystem.Data.Custom.TrialData.Correct(iTrial) = true;
+    elseif BpodSystem.Data.Custom.TrialData.LightLeft(iTrial)==0 && BpodSystem.Data.Custom.TrialData.ChoiceLeft(iTrial)==0
+        BpodSystem.Data.Custom.TrialData.Correct(iTrial) = true;
+    elseif BpodSystem.Data.Custom.TrialData.LightLeft(iTrial)==1 && BpodSystem.Data.Custom.TrialData.ChoiceLeft(iTrial)==0
+        BpodSystem.Data.Custom.TrialData.Correct(iTrial) = false;
+    elseif BpodSystem.Data.Custom.TrialData.LightLeft(iTrial)==0 && BpodSystem.Data.Custom.TrialData.ChoiceLeft(iTrial)==1
+        BpodSystem.Data.Custom.TrialData.Correct(iTrial) = false;
     end
+else
+    BpodSystem.Data.Custom.TrialData.Correct(iTrial) = true;
+end
 
 % %what trials are randomly rewarded
 % if any(strcmp('RandomReward_water_L',statesThisTrial)) || any(strcmp('RandomReward_water_R',statesThisTrialde))
@@ -111,17 +111,17 @@ BpodSystem.Data.Custom.TrialData.RewardDelay(iTrial+1) = abs( randn(1,1)*TaskPar
 BpodSystem.Data.Custom.TrialData.RandomThresholdPassed(iTrial+1)=rand(1)<TaskParameters.GUI.RandomRewardProb;
 
 %stimuli
-if ~BpodSystem.EmulatorMode
-    if TaskParameters.GUI.PlayStimulus == 2
+% if ~BpodSystem.EmulatorMode
+%     if TaskParameters.GUI.PlayStimulus == 2
 %         [BpodSystem.Data.Custom.SessionMeta.RightClickTrain,BpodSystem.Data.Custom.SessionMeta.LeftClickTrain] = getClickStimulus(BpodSystem.Data.Custom.SessionMeta.MaxSampleTime);
 %         SendCustomPulseTrain(1, BpodSystem.Data.Custom.SessionMeta.RightClickTrain, ones(1,length(BpodSystem.Data.Custom.SessionMeta.RightClickTrain))*5);
 %         SendCustomPulseTrain(2, BpodSystem.Data.Custom.SessionMeta.LeftClickTrain, ones(1,length(BpodSystem.Data.Custom.SessionMeta.LeftClickTrain))*5);
-    elseif TaskParameters.GUI.PlayStimulus == 3
-        InitiatePsychtoolbox();
-        BpodSystem.Data.Custom.SessionMeta.FreqStimulus = getFreqStimulus(BpodSystem.Data.Custom.SessionMeta.MaxSampleTime);
-        PsychToolboxSoundServer('Load', 1, BpodSystem.Data.Custom.SessionMeta.FreqStimulus);
-    end
-end
+%     elseif TaskParameters.GUI.PlayStimulus == 3
+%         InitiatePsychtoolbox();
+%         BpodSystem.Data.Custom.SessionMeta.FreqStimulus = getFreqStimulus(BpodSystem.Data.Custom.SessionMeta.MaxSampleTime);
+%         PsychToolboxSoundServer('Load', 1, BpodSystem.Data.Custom.SessionMeta.FreqStimulus);
+%     end
+% end
 
 %jackpot time
 if  TaskParameters.GUI.Jackpot ==2 || TaskParameters.GUI.Jackpot ==3

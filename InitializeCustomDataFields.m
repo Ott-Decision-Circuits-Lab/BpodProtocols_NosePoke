@@ -12,7 +12,7 @@ BpodSystem.Data.Custom.TrialData.SampleTime(1) = TaskParameters.GUI.MinSampleTim
 BpodSystem.Data.Custom.TrialData.EarlyWithdrawal(1) = false;
 BpodSystem.Data.Custom.TrialData.Jackpot(1) = false;
 
-BpodSystem.Data.Custom.SessionMeta.RandomReward=TaskParameters.GUI.RandomReward;
+BpodSystem.Data.Custom.TrialData.RandomReward=TaskParameters.GUI.RandomReward;
 BpodSystem.Data.Custom.TrialData.RandomThresholdPassed(1)=0;
 BpodSystem.Data.Custom.TrialData.RandomRewardProb=TaskParameters.GUI.RandomRewardProb;
 BpodSystem.Data.Custom.TrialData.RandomRewardAmount=TaskParameters.GUI.RandomRewardMultiplier*[TaskParameters.GUI.rewardAmount,TaskParameters.GUI.rewardAmount];
@@ -32,7 +32,7 @@ BpodSystem.Data.Custom.TrialData = orderfields(BpodSystem.Data.Custom.TrialData)
 % [~,BpodSystem.Data.Custom.Subject] = fileparts(fileparts(fileparts(fileparts(BpodSystem.Path.CurrentDataFile))));
 BpodSystem.Data.Custom.SessionMeta.PsychtoolboxStartup = false;
 BpodSystem.Data.Custom.SessionMeta.MaxSampleTime = 1; %only relevant for max stimulus length
-[BpodSystem.Data.Custom.SessionMeta.RightClickTrain, BpodSystem.Data.Custom.SessionMeta.LeftClickTrain] = GetClickStimulus(BpodSystem.Data.Custom.SessionMeta.MaxSampleTime);
-BpodSystem.Data.Custom.SessionMeta.FreqStimulus = GetFreqStimulus(BpodSystem.Data.Custom.SessionMeta.MaxSampleTime);
+% [BpodSystem.Data.Custom.SessionMeta.RightClickTrain, BpodSystem.Data.Custom.SessionMeta.LeftClickTrain] = GetClickStimulus(BpodSystem.Data.Custom.SessionMeta.MaxSampleTime);
+% BpodSystem.Data.Custom.SessionMeta.FreqStimulus = GetFreqStimulus(BpodSystem.Data.Custom.SessionMeta.MaxSampleTime);
 
 end

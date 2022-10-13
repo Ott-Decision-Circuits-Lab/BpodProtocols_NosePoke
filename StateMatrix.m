@@ -52,10 +52,10 @@ elseif TaskParameters.GUI.PlayStimulus == 2 %click
     StimStartOutput = {'BNCState',1};
     StimStart2Output = {'BNCState',1};
     StimStopOutput = {'BNCState',0};
-elseif TaskParameters.GUI.PlayStimulus == 3 %freq
-    StimStartOutput = {'SoftCode',21};
-    StimStopOutput = {'SoftCode',22};
-    StimStart2Output = {};
+% elseif TaskParameters.GUI.PlayStimulus == 3 %freq
+%     StimStartOutput = {'SoftCode',21};
+%     StimStopOutput = {'SoftCode',22};
+%     StimStart2Output = {};
 end
 
 if TaskParameters.GUI.EarlyWithdrawalNoise

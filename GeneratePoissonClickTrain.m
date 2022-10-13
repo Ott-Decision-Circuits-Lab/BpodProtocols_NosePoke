@@ -16,7 +16,6 @@ if nargin<2
     Duration = 1; % in seconds
 end
 
-nSamples = Duration*SamplingRate;
 ClickTime = zeros(1,round(ClickRate*Duration*2)); % in sampling frame scale
 
 N = 1;
