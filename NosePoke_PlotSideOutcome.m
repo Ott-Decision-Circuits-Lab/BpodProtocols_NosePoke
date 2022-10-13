@@ -68,22 +68,15 @@ switch Action
         [mn, ~] = rescaleX(AxesHandles.HandleOutcome,CurrentTrial,nTrialsToShow);
         
         %Cumulative Reward Amount
-        R = BpodSystem.Data.Custom.TrialData.RewardMagnitude;
-%         CRRtmp = repmat(  BpodSystem.Data.Custom.TrialData.CenterPortRewAmount(end),1,size(R,2));
-        ndxRwd = BpodSystem.Data.Custom.TrialData.Rewarded;
-        ndxCPRwd = BpodSystem.Data.Custom.TrialData.CenterPortRewarded;    
-        C = zeros(size(R)); C(BpodSystem.Data.Custom.TrialData.ChoiceLeft==1&ndxRwd,1) = 1; C(BpodSystem.Data.Custom.TrialData.ChoiceLeft==0&ndxRwd,2) = 1;
-%         CCP = zeros(size(CRRtmp));CCP(BpodSystem.Data.Custom.TrialData.ChoiceLeft==1&ndxCPRwd,1) = 1;
-        R = R.*C;
-%         CRR = CRRtmp.*CCP;
-        CRR = sum(ndxCPRwd).* BpodSystem.Data.Custom.TrialData.CenterPortRewAmount(end);
-        R = round(sum(R(:)) + sum(CRR(:)));
-        set(BpodSystem.GUIHandles.OutcomePlot.CumRwd, 'position', [CurrentTrial+1 1], 'string', ...
-            [num2str(R) ' microL']);
-        clear R C
+        reward_total = calculate_cumulative_reward();
+        set(BpodSystem.GUIHandles.OutcomePlot.CumRwd, ...
+            'position', [CurrentTrial+1 1], ...
+            'string', [num2str(reward_total) ' microL']);
         
-        set(BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCircle, 'xdata', CurrentTrial, 'ydata', .5);
-        set(BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCross, 'xdata', CurrentTrial, 'ydata', .5);
+        set(BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCircle, ...
+            'xdata', CurrentTrial, 'ydata', .5);
+        set(BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCross, ...
+            'xdata', CurrentTrial, 'ydata', .5);
        
         %Plot past trials
         if ~isempty(ChoiceLeft)
