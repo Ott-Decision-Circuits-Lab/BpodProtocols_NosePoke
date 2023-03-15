@@ -3,6 +3,7 @@ function NosePoke()
 
 global BpodSystem
 global TaskParameters
+
 % global Player
 
 % ------------------------Setup Stimuli--------------------------------%
@@ -36,7 +37,16 @@ TaskParameters = GUISetup();  % Set experiment parameters in GUISetup.m
 BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
 InitializePlots();
 
-if ~BpodSystem.EmulatorMode
+%% HiFi or AO module?
+if strcmp(BpodSystem.Modules.Name{1}(1),'A')
+    BpodSystem.Data.Custom.HiFiModule=false;
+    BpodSystem.Data.Custom.AOModule=true;
+elseif strcmp(BpodSystem.Modules.Name{1}(1),'H')
+    BpodSystem.Data.Custom.HiFiModule=true;
+    BpodSystem.Data.Custom.AOModule=false;
+end
+
+if ~BpodSystem.EmulatorMode && BpodSystem.Data.Custom.AOModule
     [Player, fs]=SetupWavePlayer(25000); % 25kHz =sampling rate of 8Ch with 8Ch fully on
     LoadIndependentWaveform(Player);
     LoadTriggerProfileMatrix(Player);
@@ -53,7 +63,7 @@ iTrial = 1;
 while RunSession
     InitializeCustomDataFields(iTrial); % Initialize data (trial type) vectors and first values
     
-    if ~BpodSystem.EmulatorMode
+    if ~BpodSystem.EmulatorMode && BpodSystem.Data.Custom.AOModule
         LoadTrialDependentWaveform(Player, iTrial, 5, 2); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
         InitiatePsychtoolbox();
     end

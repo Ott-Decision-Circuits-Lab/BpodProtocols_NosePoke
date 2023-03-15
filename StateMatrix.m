@@ -45,7 +45,11 @@ early_withdrawal_action = {};
 Incorrect_Action = {};
 if ~BpodSystem.EmulatorMode
     if TaskParameters.GUI.PlayStimulus == 2 %click
-        StimStartOutput = {'WavePlayer1', ['P' 3]}; %play the 4th profile
+        if BpodSystem.Data.Custom.AOModule
+            StimStartOutput = {'WavePlayer1', ['P' 3]}; %play the 4th profile
+        else
+            StimStartOutput = {};
+        end
     % elseif TaskParameters.GUI.PlayStimulus == 3 %freq
     %     StimStartOutput = {};
     %     StimStopOutput = {};
@@ -53,11 +57,19 @@ if ~BpodSystem.EmulatorMode
     end
 
     if TaskParameters.GUI.EarlyWithdrawalNoise
-        early_withdrawal_action = {'WavePlayer1', ['P' 0]}; %play the 1st profile
+        if BpodSystem.Data.Custom.AOModule
+            early_withdrawal_action = {'WavePlayer1', ['P' 0]}; %play the 1st profile
+        else
+            early_withdrawal_action = {};
+        end
     end
     
     if TaskParameters.GUI.LightGuided
-        Incorrect_Action = {'WavePlayer1', ['P' 4]};
+        if BpodSystem.Data.Custom.AOModule
+            Incorrect_Action = {'WavePlayer1', ['P' 4]};
+        else
+            Incorrect_Action = {};
+        end
     end
 end
 
