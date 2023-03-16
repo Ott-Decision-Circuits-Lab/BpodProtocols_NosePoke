@@ -1,18 +1,27 @@
-function MouseNosePoke_PlotSideOutcome(AxesHandles, Action, varargin)
+function NosePoke_PlotSideOutcome(AxesHandles, Action, varargin)
 global nTrialsToShow %this is for convenience
 global BpodSystem
 global TaskParameters
 
 switch Action
     case 'init'
-        %initialize pokes plot
-        nTrialsToShow = 90; %default number of trials to display
+        %% initialize Outcome Figure
+        BpodSystem.ProtocolFigures.SideOutcomePlotFig = figure('Position', TaskParameters.Figures.OutcomePlot.Position,'name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
+        BpodSystem.GUIHandles.OutcomePlot.HandleOutcome = axes('Position',    [  .055            .15 .91 .3]);
+        BpodSystem.GUIHandles.OutcomePlot.HandleGracePeriod = axes('Position',  [1*.05           .6  .1  .3], 'Visible', 'off');
+        BpodSystem.GUIHandles.OutcomePlot.HandleTrialRate = axes('Position',    [3*.05 + 2*.08   .6  .1  .3], 'Visible', 'off');
+        BpodSystem.GUIHandles.OutcomePlot.HandleST = axes('Position',           [5*.05 + 4*.08   .6  .1  .3], 'Visible', 'off');
+        BpodSystem.GUIHandles.OutcomePlot.HandleMT = axes('Position',           [6*.05 + 6*.08   .6  .1  .3], 'Visible', 'off');
         
+        nTrialsToShow = 90; %default number of trials to display
         if nargin >= 3 %custom number of trials
             nTrialsToShow =varargin{1};
         end
+        
+        AxesHandles = BpodSystem.GUIHandles.OutcomePlot;
+        
+        %% Outcome Plot
         axes(AxesHandles.HandleOutcome);
-        %plot in specified axes
         BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCircle = line(-1,0.5, 'LineStyle','none','Marker','o','MarkerEdge','k','MarkerFace',[1 1 1], 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.CurrentTrialCross = line(-1,0.5, 'LineStyle','none','Marker','+','MarkerEdge','k','MarkerFace',[1 1 1], 'MarkerSize',6);
         BpodSystem.GUIHandles.OutcomePlot.RewardedL = line(-1,1, 'LineStyle','none','Marker','o','MarkerEdge','g','MarkerFace','g', 'MarkerSize',6);
