@@ -1,4 +1,4 @@
-function save_custom_data_and_params_csv()
+function SaveCustomDataAndParamsCSV()
 %{
 Function to write trial custom data from NosePoke
 into a tab separated value file (.tsv)
