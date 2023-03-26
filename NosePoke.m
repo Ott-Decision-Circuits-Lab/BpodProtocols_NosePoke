@@ -9,7 +9,8 @@ NosePoke_PlotSideOutcome(BpodSystem.GUIHandles,'init');
 
 if ~BpodSystem.EmulatorMode
     if isfield(BpodSystem.ModuleUSB, 'WavePlayer1')
-        [Player, ~] = SetupWavePlayer(50000); % 25kHz =sampling rate of 8Ch with 8Ch fully on; 50kHz for 4Ch; 100kHZ for 2Ch
+        ChannelNumber = 4;
+        [Player, ~] = SetupWavePlayer(ChannelNumber); % 25kHz =sampling rate of 8Ch with 8Ch fully on; 50kHz for 4Ch; 100kHZ for 2Ch
     elseif isfield(BpodSystem.ModuleUSB, 'HiFi1')
         [Player, ~] = SetupHiFi(192000); % 192kHz = max sampling rate
     else
