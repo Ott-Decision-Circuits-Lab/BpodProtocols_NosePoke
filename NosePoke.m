@@ -37,7 +37,8 @@ BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler';
 InitializePlots();
 
 if ~BpodSystem.EmulatorMode
-    [Player, fs]=SetupWavePlayer(25000); % 25kHz =sampling rate of 8Ch with 8Ch fully on
+    ChannelNumber = 4;
+    [Player, fs]=SetupWavePlayer(ChannelNumber); % 25kHz =sampling rate of 8Ch with 8Ch fully on
     LoadIndependentWaveform(Player);
     LoadTriggerProfileMatrix(Player);
 end
