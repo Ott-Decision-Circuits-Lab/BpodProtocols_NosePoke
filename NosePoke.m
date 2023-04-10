@@ -50,18 +50,30 @@ while RunSession
     if TaskParameters.GUI.Photometry
         Nidaq_photometry('Stop');
         [PhotoData,Photo2Data] = Nidaq_photometry('Save');
-        BpodSystem.Data.Custom.TrialData.NidaqData{iTrial} = PhotoData;
+        NidaqData = PhotoData;
         if TaskParameters.GUI.DbleFibers || TaskParameters.GUI.RedChannel
-            BpodSystem.Data.Custom.TrialData.Nidaq2Data{iTrial} = Photo2Data;
+            Nidaq2Data = Photo2Data;
+        else
+            Nidaq2Data = [];
+        end
+        % save separately per trial (too large/slow to save entire history to disk)
+        if BpodSystem.Status.BeingUsed ~= 0 %only when bpod still active (due to how bpod stops a protocol this would be run again after the last trial)
+            [DataFolder, DataName, ~] = fileparts(BpodSystem.Path.CurrentDataFile);
+            NidaqDatafolder = [DataFolder, '\', DataName];
+            if ~isdie(NidaqDataFolder)
+                mkdir(NidaqDataFolder)
+            end
+            fname = fullfile(NidaqDataFolder, ['NidaqData', num2str(iTrial),'.mat']);
+            save(fname,'NidaqData','Nidaq2Data')
         end
     end
    
-    % Bpod save & update fields
+    % Bpod save and update custom data fields for this trial
     if ~isempty(fieldnames(RawEvents))
         BpodSystem.Data = AddTrialEvents(BpodSystem.Data,RawEvents);
         InsertSessionDescription(iTrial);
         UpdateCustomDataFields(iTrial);
-        SaveBpodSessionData();
+        SaveBpodSessionData;
     end
 
     HandlePauseCondition; % Checks to see if the protocol is paused. If so, waits until user resumes.
