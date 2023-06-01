@@ -85,7 +85,7 @@ while RunSession
          % save separately per trial (too large/slow to save entire history to disk)
         if BpodSystem.Status.BeingUsed ~= 0 %only when bpod still active (due to how bpod stops a protocol this would be run again after the last trial)
             [DataFolder, DataName, ~] = fileparts(BpodSystem.Path.CurrentDataFile);
-            NidaqDataFolder = [DataFolder, '\', DataName];
+            NidaqDataFolder = [DataFolder, '\', DataName, '_Photometry'];
             if ~isdir(NidaqDataFolder)
                 mkdir(NidaqDataFolder)
             end
