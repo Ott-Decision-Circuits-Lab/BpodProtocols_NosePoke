@@ -1,4 +1,4 @@
-function InitializeCustomDataFields(iTrial)
+function NosePoke_InitializeCustomDataFields(iTrial)
 %{ 
 Initializing data (trial type) vectors and first values
 %}

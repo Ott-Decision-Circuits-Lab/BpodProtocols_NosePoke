@@ -1,4 +1,4 @@
-function TaskParameters = GUISetup()
+function TaskParameters = NosePoke_GUISetup()
 
 global BpodSystem
 

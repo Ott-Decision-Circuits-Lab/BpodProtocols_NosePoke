@@ -1,4 +1,4 @@
-function LoadIndependentWaveform(Player)
+function NosePoke_LoadWaveform(Player)
 % global Player
 global TaskParameters
 

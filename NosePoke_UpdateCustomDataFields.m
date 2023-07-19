@@ -1,5 +1,4 @@
-function UpdateCustomDataFields(iTrial)
-
+function NosePoke_UpdateCustomDataFields(iTrial)
 global BpodSystem
 global TaskParameters
 

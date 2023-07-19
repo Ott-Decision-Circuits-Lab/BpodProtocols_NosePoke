@@ -1,4 +1,4 @@
-function InsertSessionDescription(iTrial)
+function NosePoke_InsertSessionDescription(iTrial)
 global BpodSystem
 global TaskParameters
 
