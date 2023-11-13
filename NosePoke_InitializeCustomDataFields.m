@@ -1,21 +1,29 @@
 function NosePoke_InitializeCustomDataFields(iTrial)
 %{ 
-Initializing data (trial type) vectors and first values
+Initializing trial data
 %}
 
 global BpodSystem
 global TaskParameters
 
 if iTrial == 1
-    BpodSystem.Data.Custom.TrialData.ChoiceLeft(iTrial) = NaN;
+    BpodSystem.Data.Custom.TrialData = struct(); % initializing .TrialData
 end
 
 TrialData = BpodSystem.Data.Custom.TrialData;
 
-% Trial data
+%% Pre-stimulus delivery
+TrialData.NoTrialStart(iTrial) = true; % true = no state StartCIn; false = with state StartCIn.
+
+TrialData.TimeCenterPoke(iTrial) = NaN; % Time when CIn
+TrialData.BrokeFixation(iTrial) = NaN; % NaN = no state StartCIn; true = with state BrokeFixation; false = with state Sampling
+TrialData.StimDelay(iTrial) = TaskParameters.GUI.StimDelay;
+
+
+
 TrialData.ChoiceLeft(iTrial) = NaN;
-TrialData.EarlyWithdrawal(iTrial) = false;
-TrialData.Jackpot(iTrial) = false;
+% TrialData.EarlyWithdrawal(iTrial) = false;
+% TrialData.Jackpot(iTrial) = false;
 
 TrialData.sample_length(iTrial) = NaN; % old ST
 TrialData.move_time(iTrial) = NaN; % poke out from center to poke in at a side, old MT
