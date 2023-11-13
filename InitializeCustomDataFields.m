@@ -82,7 +82,7 @@ trial_data.RewardMagnitudeR(iTrial) = trial_data.RewardMagnitude(2, iTrial);
 %% Auto-Incrementing sample time
 if TaskParameters.GUI.AutoIncrSample && iTrial > 1
     History = 50; % Rat: History = 50
-    Crit = 0.8; % Rat: Crit = 0.8
+    Crit = 0.6; % Rat: Crit = 0.8
     if iTrial<5
         ConsiderTrials = iTrial;
     else
