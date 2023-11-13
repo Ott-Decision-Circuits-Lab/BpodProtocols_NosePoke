@@ -1,4 +1,4 @@
-function sma = StateMatrix(iTrial)
+function sma = NosePoke_StateMatrix(iTrial)
 
 global BpodSystem
 global TaskParameters

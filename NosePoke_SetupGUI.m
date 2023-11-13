@@ -174,7 +174,7 @@ if isempty(fieldnames(TaskParameters))
                                               'LED1b_Name', 'LED1b_Amp', 'LED1b_Freq'};
                         
     %% rig-specific
-    TaskParameters.GUI.nidaqDev = 'Dev1';
+    TaskParameters.GUI.nidaqDev = 'Dev2';
     TaskParameters.GUIMeta.nidaqDev.Style = 'edittext';
 
     TaskParameters.GUIPanels.PhotometryRig = {'nidaqDev'};
@@ -183,7 +183,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUITabs.Photometry = {'PhotometryRecording', 'PhotometryNidaq', 'PhotometryPlot', 'PhotometryRig'};
        
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
-    TaskParameters.Figures.OutcomePlot.Position = [200, 200, 1000, 400];
+    TaskParameters.Figures.OutcomePlot.Position = [50, 50, 1000, 400];
 end
 BpodParameterGUI('init', TaskParameters);
 

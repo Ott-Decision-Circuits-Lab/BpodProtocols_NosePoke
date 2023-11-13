@@ -5,7 +5,7 @@ global BpodSystem
 global TaskParameters
 
 %% initialize GUI and plot
-TaskParameters = NosePoke_GUISetup();  % Set experiment parameters in GUISetup.m, if no Setting File is chosen
+TaskParameters = NosePoke_SetupGUI();  % Set experiment parameters in GUISetup.m, if no Setting File is chosen
 NosePoke_PlotSideOutcome(BpodSystem.GUIHandles, 'init');
 
 %% set up additional bpod module(s) and load waveform
@@ -41,12 +41,12 @@ while RunSession
     NosePoke_PlotSideOutcome(BpodSystem.GUIHandles.OutcomePlot, 'UpdateTrial', iTrial);
     
     %% load waveform to auxillary bpod modules
-    if ~BpodSystem.EmulatorMode && BpodSystem.Data.Custom.AOModule
-        LoadTrialDependentWaveform(Player, iTrial, 5, 2); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
+    if ~BpodSystem.EmulatorMode
+        NosePoke_LoadWaveform(Player, 'TrialDependent', iTrial); % Load white noise, stimuli trains, and error sound to wave player if not EmulatorMode
     end    
     
     %% set up state matrix and send to bpod
-    sma = StateMatrix(iTrial);
+    sma = NosePoke_StateMatrix(iTrial);
     SendStateMatrix(sma);
     
     %% NIDAQ Get nidaq ready to start
