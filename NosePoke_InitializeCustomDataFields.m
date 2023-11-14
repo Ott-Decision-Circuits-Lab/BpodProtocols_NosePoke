@@ -17,117 +17,103 @@ TrialData.NoTrialStart(iTrial) = true; % true = no state StartCIn; false = with 
 
 TrialData.TimeCenterPoke(iTrial) = NaN; % Time when CIn
 TrialData.BrokeFixation(iTrial) = NaN; % NaN = no state StartCIn; true = with state BrokeFixation; false = with state Sampling
-TrialData.StimDelay(iTrial) = TaskParameters.GUI.StimDelay;
 
-
-
-TrialData.ChoiceLeft(iTrial) = NaN;
-% TrialData.EarlyWithdrawal(iTrial) = false;
-% TrialData.Jackpot(iTrial) = false;
-
-TrialData.sample_length(iTrial) = NaN; % old ST
-TrialData.move_time(iTrial) = NaN; % poke out from center to poke in at a side, old MT
-TrialData.port_entry_delay(iTrial) = NaN;  % delay time , old DT
-TrialData.false_exits(1:50,iTrial) = NaN(50,1); % old GracePeriod
-
-TrialData.Rewarded(iTrial) = false;
-TrialData.LightLeft(iTrial) = rand(1,1)<0.5;
-TrialData.CenterPortRewarded(iTrial)  = false;
-TrialData.CenterPortRewAmount(iTrial) = TaskParameters.GUI.CenterPortRewAmount;
-TrialData.RewardAvailable(iTrial) = rand(1,1)<TaskParameters.GUI.RewardProb;
-
-if iTrial == 1
-    TrialData.RewardDelay(iTrial) = TaskParameters.GUI.DelayMean;
-else
-    TrialData.RewardDelay(iTrial) = abs(randn(1,1)*TaskParameters.GUI.DelaySigma + TaskParameters.GUI.DelayMean);
+TrialData.SamplingTarget(iTrial) = TaskParameters.GUI.SamplingTarget;
+if TaskParameters.GUI.AutoIncrSamplingTarget
+    if iTrial > 1
+        History = 50; % Rat: History = 50
+        Crit = 0.6; % Rat: Crit = 0.6
+        ConsiderTrials = max(1,iTrial-History):1:iTrial-1;
+        ConsiderTrials = ConsiderTrials(~isnan(TrialData.BrokeFixation(ConsiderTrials))); % exclude trials did not start
+        NotBrokeFixationRate = sum(~TrialData.BrokeFixation(ConsiderTrials))/length(ConsiderTrials);
+        
+        if NotBrokeFixationRate > Crit
+            if TrialData.BrokeFixation(iTrial-1) == false % If last trial is not BrokeFixation nor NaN (e.g. NoTrialStart)
+                TrialData.SamplingTarget(iTrial) = TrialData.SamplingTarget(iTrial) + TaskParameters.GUI.SamplingTargetIncrStepSize; % StimulusDelay increased
+            end
+        elseif NotBrokeFixationRate < Crit/2
+            if TrialData.BrokeFixation(iTrial-1) == true % If last trial is Broke Fixation (and not NaN)
+                TrialData.SamplingTarget(iTrial) = TrialData.SamplingTarget(iTrial) - TaskParameters.GUI.SamplingTargetDecrStepSize; % StimulusDelay decreased
+            end
+        end
+    end    
 end
 
-TrialData.SampleTime(iTrial) = TaskParameters.GUI.MinSampleTime;
-TrialData.RandomReward(iTrial) = TaskParameters.GUI.RandomReward;
-TrialData.RandomRewardProb(iTrial) = TaskParameters.GUI.RandomRewardProb;
-TrialData.RandomThresholdPassed(iTrial) = rand(1) < TaskParameters.GUI.RandomRewardProb;
-TrialData.RandomRewardAmount(iTrial, :) = TaskParameters.GUI.RandomRewardMultiplier*[TaskParameters.GUI.rewardAmount,TaskParameters.GUI.rewardAmount];
+if TrialData.SamplingTarget(iTrial) > TaskParameters.GUI.SamplingTargetMax % allow adjustment even if StimDelayAutoIncr is off
+    TrialData.SamplingTarget(iTrial) = TaskParameters.GUI.SamplingTargetMax;
+elseif TrialData.SamplingTarget(iTrial) < TaskParameters.GUI.SamplingTargetMin
+    TrialData.SamplingTarget(iTrial) = TaskParameters.GUI.SamplingTargetMin;
+end
+
+TaskParameters.GUI.SamplingTarget = TrialData.SamplingTarget(iTrial);
+TrialData.SamplingTime(iTrial) = NaN; % Time that stayed CenterPortIn for SamplingTarget
+TrialData.SamplingGrace(1,iTrial) = NaN; % old GracePeriod, row is for the n-th time the state is entered, column is for the time in this State
+
+TrialData.CenterPortRewarded(iTrial) = NaN;
+TrialData.CenterPortBaited(iTrial) = TaskParameters.GUI.CenterPortProb > rand;
+TrialData.CenterPortRewardAmount(iTrial) = TaskParameters.GUI.CenterPortRewardAmount * TrialData.CenterPortBaited(iTrial);
+
+TrialData.LightLeft(iTrial) = NaN; % if true, 1-arm bandit with left poke being correct
+if TaskParameters.GUI.SingleSidePoke
+    TrialData.LightLeft(iTrial) = rand < 0.5;
+end
+
+%% Peri-decision and pre-outcome
+TrialData.NoDecision(iTrial) = NaN; % True if no decision made
+TrialData.MoveTime(iTrial) = NaN; % from CenterPortOut to SidePortIn(or re-CenterPortIn for StartNewTrial), old MT
+
+TrialData.ChoiceLeft(iTrial) = NaN;
+
+TrialData.port_entry_delay(iTrial) = NaN;  % delay time , old DT
+TrialData.false_exits(1:50, iTrial) = NaN(50,1); % old GracePeriod
+
+%% Peri-outcome
+if iTrial == 1
+    TrialData.FeedbackDelay(iTrial) = TaskParameters.GUI.FeedbackDelayMean;
+else
+    TrialData.FeedbackDelay(iTrial) = abs(randn(1,1) * TaskParameters.GUI.FeedbackDelaySigma + TaskParameters.GUI.FeedbackDelayMean);
+end
+TrialData.FeedbackWaitingTime(iTrial) = NaN;
+
+TrialData.SkippedFeedback(iTrial) = false;
 
 %% Reward Magnitude in different situations
-TrialData.RewardMagnitude(:, iTrial) = [TaskParameters.GUI.rewardAmount,TaskParameters.GUI.rewardAmount]';
+TrialData.Baited(:, iTrial) = rand(2,1) < TaskParameters.GUI.RewardProb;
+if TrialData.LightLeft(iTrial) == 1 % adjustment by SingleSidePoke, i.e. old Light-guided
+    TrialData.Baited(2, iTrial) = 0;
+elseif TrialData.LightLeft(iTrial) == 0
+    TrialData.Baited(1, iTrial) = 0;
+end
 
-% depletion
-%if a random reward appears - it does not disrupt the previous depletion
-%train and depletion is calculated by multiplying from the normal reward
-%amount and not the surprise reward amount (e.g. reward amount for all
-%right choices 25 - 20 -16- 12.8 - 10.24 -8.192 - 5.2429 - 37.5 - 4.194
-
-if TaskParameters.GUI.Deplete && iTrial > 1
+if TaskParameters.GUI.BiasControlDepletion && iTrial > 1
+    %{
+    depletion
+    if a random reward appears - it does not disrupt the previous depletion
+    train and depletion is calculated by multiplying from the normal reward
+    amount and not the surprise reward amount (e.g. reward amount for all
+    right choices 25 - 20 -16- 12.8 - 10.24 -8.192 - 5.2429 - 37.5 - 4.194
+    %}
     DummyRewardMag = TrialData.RewardMagnitude(:, iTrial-1);
     
     if  TrialData.ChoiceLeft(iTrial-1) == 1
-        TrialData.RewardMagnitude(1, iTrial) = DummyRewardMag(1)*TaskParameters.GUI.DepleteRateLeft;
+        TrialData.RewardMagnitude(1, iTrial) = DummyRewardMag(1) * TaskParameters.GUI.LeftDepletionRate;
     elseif TrialData.ChoiceLeft(iTrial-1) == 0
-        TrialData.RewardMagnitude(2, iTrial) = DummyRewardMag(2)*TaskParameters.GUI.DepleteRateRight;
+        TrialData.RewardMagnitude(2, iTrial) = DummyRewardMag(2) * TaskParameters.GUI.RightDepletionRate;
     elseif isnan(TrialData.ChoiceLeft(iTrial-1))
         TrialData.RewardMagnitude(:, iTrial) = TrialData.RewardMagnitude(:, iTrial-1);
     end
+else
+    TrialData.RewardMagnitude(:, iTrial) = TaskParameters.GUI.RewardAmount * ones(2,1);
 end
 
-% random reward - no change in state matrix, changes RewardMagnitude on a trial by trial basis
-
-if TaskParameters.GUI.RandomReward == true && TrialData.RandomThresholdPassed(iTrial)==1
-    surpriseRewardAmount = TaskParameters.GUI.rewardAmount*TaskParameters.GUI.RandomRewardMultiplier;
-    TrialData.RewardMagnitude(:, iTrial) = TrialData.RewardMagnitude(:, iTrial) + surpriseRewardAmount;    
-end
-
-% light-guided - with change in state matrix, here only to for data output
-if TaskParameters.GUI.LightGuided
-    if TrialData.LightLeft(iTrial)
-        TrialData.RewardMagnitude(2, iTrial) = 0;
-    elseif ~TrialData.LightLeft(iTrial)
-        TrialData.RewardMagnitude(1, iTrial) = 0;
-    end
-end
+TrialData.RewardMagnitude(:, iTrial) = TrialData.RewardMagnitude(:, iTrial).* TrialData.Baited(:, iTrial);
 
 TrialData.RewardMagnitudeL(iTrial) = TrialData.RewardMagnitude(1, iTrial);
 TrialData.RewardMagnitudeR(iTrial) = TrialData.RewardMagnitude(2, iTrial);
-%% Auto-Incrementing sample time
-if TaskParameters.GUI.AutoIncrSample && iTrial > 1
-    History = 50; % Rat: History = 50
-    Crit = 0.8; % Rat: Crit = 0.8
-    if iTrial<5
-        ConsiderTrials = iTrial;
-    else
-        ConsiderTrials = max(1,iTrial-History):1:iTrial;
-    end
-    ConsiderTrials = ConsiderTrials(~isnan(TrialData.ChoiceLeft(ConsiderTrials))|TrialData.EarlyWithdrawal(ConsiderTrials));
-    if sum(~TrialData.EarlyWithdrawal(ConsiderTrials))/length(ConsiderTrials) > Crit % If SuccessRate > crit (80%)
-        if ~TrialData.EarlyWithdrawal(iTrial-1) % If last trial is not EWD
-            TrialData.SampleTime(iTrial) = min(TaskParameters.GUI.MaxSampleTime,max(TaskParameters.GUI.MinSampleTime,TrialData.SampleTime(iTrial-1) + TaskParameters.GUI.MinSampleIncr)); % SampleTime increased
-        else % If last trial = EWD
-            TrialData.SampleTime(iTrial) = min(TaskParameters.GUI.MaxSampleTime,max(TaskParameters.GUI.MinSampleTime,TrialData.SampleTime(iTrial-1))); % SampleTime = max(MinSampleTime or SampleTime)
-        end
-    elseif sum(~TrialData.EarlyWithdrawal(ConsiderTrials))/length(ConsiderTrials) < Crit/2  % If SuccessRate < crit/2 (40%)
-        if TrialData.EarlyWithdrawal(iTrial-1) % If last trial = EWD
-            TrialData.SampleTime(iTrial) = max(TaskParameters.GUI.MinSampleTime,min(TaskParameters.GUI.MaxSampleTime,TrialData.SampleTime(iTrial-1) - TaskParameters.GUI.MinSampleDecr)); % SampleTime decreased
-        else
-            TrialData.SampleTime(iTrial) = min(TaskParameters.GUI.MaxSampleTime,max(TaskParameters.GUI.MinSampleTime,TrialData.SampleTime(iTrial-1))); % SampleTime = max(MinSampleTime or SampleTime)
-        end
-    else % If crit/2 < SuccessRate < crit
-        TrialData.SampleTime(iTrial) =  TrialData.SampleTime(iTrial-1); % SampleTime unchanged
-    end
-else
-    TrialData.SampleTime(iTrial) = TaskParameters.GUI.MinSampleTime;
-end
 
-if  TaskParameters.GUI.Jackpot ==2 || TaskParameters.GUI.Jackpot ==3
-    if sum(~isnan(TrialData.ChoiceLeft(1:iTrial)))>10
-        TaskParameters.GUI.JackpotTime = max(TaskParameters.GUI.JackpotMin,quantile(TrialData.sample_length,0.95));
-    else
-        TaskParameters.GUI.JackpotTime = TaskParameters.GUI.JackpotMin;
-    end
-end
-
-if iTrial > 1 && TrialData.Jackpot(iTrial-1) % If last trial is Jackpottrial
-    TrialData.SampleTime(iTrial) = TrialData.SampleTime(iTrial)+0.05*TaskParameters.GUI.JackpotTime; % SampleTime = SampleTime + 5% JackpotTime
-end
-TaskParameters.GUI.SampleTime = TrialData.SampleTime(iTrial); % update SampleTime
+TrialData.Rewarded(iTrial) = false;
+TrialData.TimeReward(iTrial) = NaN;
+TrialData.DrinkingTime(iTrial) = NaN;
 
 %%
 BpodSystem.Data.Custom.TrialData = TrialData;
