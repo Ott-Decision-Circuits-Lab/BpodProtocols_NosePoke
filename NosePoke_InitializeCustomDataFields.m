@@ -14,9 +14,7 @@ TrialData = BpodSystem.Data.Custom.TrialData;
 
 %% Pre-stimulus delivery
 TrialData.NoTrialStart(iTrial) = true; % true = no state StartCIn; false = with state StartCIn.
-
 TrialData.TimeCenterPoke(iTrial) = NaN; % Time when CIn
-TrialData.BrokeFixation(iTrial) = NaN; % NaN = no state StartCIn; true = with state BrokeFixation; false = with state Sampling
 
 TrialData.SamplingTarget(iTrial) = TaskParameters.GUI.SamplingTarget;
 if TaskParameters.GUI.AutoIncrSamplingTarget
@@ -48,65 +46,70 @@ end
 TaskParameters.GUI.SamplingTarget = TrialData.SamplingTarget(iTrial);
 TrialData.SamplingTime(iTrial) = NaN; % Time that stayed CenterPortIn for SamplingTarget
 TrialData.SamplingGrace(1,iTrial) = NaN; % old GracePeriod, row is for the n-th time the state is entered, column is for the time in this State
+TrialData.BrokeFixation(iTrial) = NaN; % NaN = no state StartCIn; true = with state BrokeFixation; false = with state Sampling
 
-TrialData.CenterPortRewarded(iTrial) = NaN;
 TrialData.CenterPortBaited(iTrial) = TaskParameters.GUI.CenterPortProb > rand;
 TrialData.CenterPortRewardAmount(iTrial) = TaskParameters.GUI.CenterPortRewardAmount * TrialData.CenterPortBaited(iTrial);
+TrialData.CenterPortRewarded(iTrial) = NaN;
 
+%% Peri-decision and pre-outcome
 TrialData.LightLeft(iTrial) = NaN; % if true, 1-arm bandit with left poke being correct
 if TaskParameters.GUI.SingleSidePoke
     TrialData.LightLeft(iTrial) = rand < 0.5;
 end
 
-%% Peri-decision and pre-outcome
 TrialData.NoDecision(iTrial) = NaN; % True if no decision made
 TrialData.MoveTime(iTrial) = NaN; % from CenterPortOut to SidePortIn(or re-CenterPortIn for StartNewTrial), old MT
 
-TrialData.ChoiceLeft(iTrial) = NaN;
+TrialData.TimeChoice(iTrial) = NaN;
+TrialData.ChoiceLeft(iTrial) = NaN; % True if a choice is made to the left poke (also include incorrect choice)
+TrialData.IncorrectChoice(iTrial) = NaN; % True if the choice is incorrect (only for 1-arm bandit/GUI.SingleSidePoke);
+% basically = LigthLeft & ChoiceLeft; doesn't necessary in the state of
+% IncorrectChoice (may end up in SkippedFeedback first)
 
-TrialData.port_entry_delay(iTrial) = NaN;  % delay time , old DT
-TrialData.false_exits(1:50, iTrial) = NaN(50,1); % old GracePeriod
-
-%% Peri-outcome
 if iTrial == 1
     TrialData.FeedbackDelay(iTrial) = TaskParameters.GUI.FeedbackDelayMean;
 else
     TrialData.FeedbackDelay(iTrial) = abs(randn(1,1) * TaskParameters.GUI.FeedbackDelaySigma + TaskParameters.GUI.FeedbackDelayMean);
 end
-TrialData.FeedbackWaitingTime(iTrial) = NaN;
 
-TrialData.SkippedFeedback(iTrial) = false;
+TrialData.FeedbackGrace(1, iTrial) = NaN; % first index for the number of time the state is entered
+TrialData.FeedbackWaitingTime(iTrial) = NaN; % Time spend to wait for feedback
+TrialData.TimeSkippedFeedback(iTrial) = NaN;
+TrialData.SkippedFeedback(iTrial) = NaN; % True if SkippedFeedback
+TrialData.TITrial(iTrial) = NaN; % True if it is included in TimeInvestment
 
-%% Reward Magnitude in different situations
-TrialData.Baited(:, iTrial) = rand(2,1) < TaskParameters.GUI.RewardProb;
-if TrialData.LightLeft(iTrial) == 1 % adjustment by SingleSidePoke, i.e. old Light-guided
-    TrialData.Baited(2, iTrial) = 0;
-elseif TrialData.LightLeft(iTrial) == 0
-    TrialData.Baited(1, iTrial) = 0;
-end
-
-if TaskParameters.GUI.BiasControlDepletion && iTrial > 1
-    %{
-    depletion
-    if a random reward appears - it does not disrupt the previous depletion
-    train and depletion is calculated by multiplying from the normal reward
-    amount and not the surprise reward amount (e.g. reward amount for all
-    right choices 25 - 20 -16- 12.8 - 10.24 -8.192 - 5.2429 - 37.5 - 4.194
-    %}
-    DummyRewardMag = TrialData.RewardMagnitude(:, iTrial-1);
-    
-    if  TrialData.ChoiceLeft(iTrial-1) == 1
-        TrialData.RewardMagnitude(1, iTrial) = DummyRewardMag(1) * TaskParameters.GUI.LeftDepletionRate;
-    elseif TrialData.ChoiceLeft(iTrial-1) == 0
-        TrialData.RewardMagnitude(2, iTrial) = DummyRewardMag(2) * TaskParameters.GUI.RightDepletionRate;
-    elseif isnan(TrialData.ChoiceLeft(iTrial-1))
-        TrialData.RewardMagnitude(:, iTrial) = TrialData.RewardMagnitude(:, iTrial-1);
+%% Peri-outcome
+% Reward Magnitude in different situations
+if TaskParameters.GUI.BiasControlDepletion
+    TrialData.RewardMagnitude(:, iTrial) = TaskParameters.GUI.RewardAmount * ones(2,1);
+    if iTrial > 1
+        %{
+        depletion (superior to RewardProb and SingleSidePoke)
+        if a random reward appears - it does not disrupt the previous depletion
+        train and depletion is calculated by multiplying from the normal reward
+        amount and not the surprise reward amount (e.g. reward amount for all
+        right choices 25 - 20 -16- 12.8 - 10.24 -8.192 - 5.2429 - 37.5 - 4.194
+        %}
+        DummyRewardMag = TrialData.RewardMagnitude(:, iTrial-1);
+        
+        if  TrialData.ChoiceLeft(iTrial-1) == 1
+            TrialData.RewardMagnitude(1, iTrial) = DummyRewardMag(1) * TaskParameters.GUI.LeftDepletionRate;
+        elseif TrialData.ChoiceLeft(iTrial-1) == 0
+            TrialData.RewardMagnitude(2, iTrial) = DummyRewardMag(2) * TaskParameters.GUI.RightDepletionRate;
+        elseif isnan(TrialData.ChoiceLeft(iTrial-1))
+            TrialData.RewardMagnitude(:, iTrial) = TrialData.RewardMagnitude(:, iTrial-1);
+        end
     end
 else
-    TrialData.RewardMagnitude(:, iTrial) = TaskParameters.GUI.RewardAmount * ones(2,1);
+    TrialData.Baited(:, iTrial) = rand(2,1) < TaskParameters.GUI.RewardProb;
+    if TrialData.LightLeft(iTrial) == 1 % adjustment by SingleSidePoke, i.e. old Light-guided
+        TrialData.Baited(2, iTrial) = 0;
+    elseif TrialData.LightLeft(iTrial) == 0
+        TrialData.Baited(1, iTrial) = 0;
+    end
+    TrialData.RewardMagnitude(:, iTrial) = TrialData.RewardMagnitude(:, iTrial).* TrialData.Baited(:, iTrial);
 end
-
-TrialData.RewardMagnitude(:, iTrial) = TrialData.RewardMagnitude(:, iTrial).* TrialData.Baited(:, iTrial);
 
 TrialData.RewardMagnitudeL(iTrial) = TrialData.RewardMagnitude(1, iTrial);
 TrialData.RewardMagnitudeR(iTrial) = TrialData.RewardMagnitude(2, iTrial);

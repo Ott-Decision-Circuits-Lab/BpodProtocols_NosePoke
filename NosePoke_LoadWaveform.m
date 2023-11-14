@@ -19,22 +19,22 @@ switch Mode
     case 'TrialIndependent'
         %%
         SoundIndex = 1;
-        EarlyWithdrawalSound = [];
-        if isfield(TaskParameters.GUI, 'EarlyWithdrawalTimeOut') && TaskParameters.GUI.EarlyWithdrawalTimeOut > 0
-            switch TaskParameters.GUIMeta.EarlyWithdrawalFeedback.String{TaskParameters.GUI.EarlyWithdrawalFeedback}
+        BrokeFixationSound = [];
+        if isfield(TaskParameters.GUI, 'BrokeFixationTimeOut') && TaskParameters.GUI.BrokeFixationTimeOut > 0
+            switch TaskParameters.GUIMeta.BrokeFixationFeedback.String{TaskParameters.GUI.BrokeFixationFeedback}
                 case 'None' % no adjustment
 
                 case 'WhiteNoise'
-                    EarlyWithdrawalSound = rand(1, fs*TaskParameters.GUI.EarlyWithdrawalTimeOut)*2 - 1;
+                    BrokeFixationSound = rand(1, fs*TaskParameters.GUI.BrokeFixationTimeOut)*2 - 1;
             end
         end
 
-        if ~isempty(EarlyWithdrawalSound)
+        if ~isempty(BrokeFixationSound)
             if isfield(BpodSystem.ModuleUSB, 'WavePlayer1')
-                Player.loadWaveform(SoundIndex, EarlyWithdrawalSound);
+                Player.loadWaveform(SoundIndex, BrokeFixationSound);
                 Player.TriggerProfiles(SoundIndex, 1:2) = SoundIndex;
             elseif isfield(BpodSystem.ModuleUSB, 'HiFi1')
-                Player.load(SoundIndex, EarlyWithdrawalSound);
+                Player.load(SoundIndex, BrokeFixationSound);
             end
         end
 

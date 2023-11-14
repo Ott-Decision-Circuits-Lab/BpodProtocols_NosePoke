@@ -28,25 +28,10 @@ RightValve = 2^(RightPort-1);
 
 %% Calculate value time for ports in different situations
 LeftValveTime  = GetValveTimes(TrialData.RewardMagnitude(1, iTrial), LeftPort);
-CenterValveTime = 0;
-if TaskParameters.GUI.Jackpot == 4 && rand(1,1) <= TaskParameters.GUI.CenterPortProb
-    CenterValveTime  = min([0.1,max([0.001,GetValveTimes(TrialData.CenterPortRewAmount(iTrial), CenterPort)])]);
-end
+CenterValveTime = GetValveTimes(TrialData.CenterPortRewardAmount(iTrial), CenterPort);
 RightValveTime = GetValveTimes(TrialData.RewardMagnitude(2, iTrial), RightPort);
 
-JackpotFactor = 2; % Fixed Jackpot reward
-if TaskParameters.GUI.Jackpot == 3 % Decremental Jackpot reward
-    JackpotFactor = max(2,10 - sum(TrialData.Jackpot));
-end
-LeftValveTimeJackpot  = JackpotFactor * LeftValveTime;
-RightValveTimeJackpot  = JackpotFactor * RightValveTime;
-
 %% Sound Output action
-StimStartOutput = {};
-StimStart2Output = {};
-StimStopOutput = {};
-EarlyWithdrawalAction = {};
-IncorrectChoiceAction = {};
 if ~BpodSystem.EmulatorMode
     if TaskParameters.GUI.PlayStimulus == 2 %click
         if BpodSystem.Data.Custom.AOModule
@@ -60,14 +45,6 @@ if ~BpodSystem.EmulatorMode
     %     StimStart2Output = {};
     end
 
-    if TaskParameters.GUI.EarlyWithdrawalNoise
-        if BpodSystem.Data.Custom.AOModule
-            EarlyWithdrawalAction = {'WavePlayer1', ['P' 0]}; %play the 1st profile
-        else
-            EarlyWithdrawalAction = {};
-        end
-    end
-    
     if TaskParameters.GUI.LightGuided
         if BpodSystem.Data.Custom.AOModule
             IncorrectChoiceAction = {'WavePlayer1', ['P' 4]};
@@ -116,31 +93,82 @@ sma = AddState(sma, 'Name', 'PreITI',...
     'OutputActions', {});
 
 sma = AddState(sma, 'Name', 'WaitCIn',...
-    'Timer', 0,...
-    'StateChangeConditions', {CenterPortIn, 'StartSampling'},...
+    'Timer', TaskParameters.GUI.WaitCInMax,...
+    'StateChangeConditions', {CenterPortIn, 'StartSampling',...
+                              'Tup', 'ITI'},...
     'OutputActions', {CenterLight, 255});
 
-sma = SetGlobalTimer(sma, 1, TaskParameters.GUI.SampleTime);
+sma = SetGlobalTimer(sma, 1, TaskParameters.GUI.SamplingTarget);
+
 sma = AddState(sma, 'Name', 'StartSampling',... % dummy state for trigger GlobalTimer1
     'Timer', 0.01,...
-    'StateChangeConditions', {'Tup', 'Sampling'},...
-    'OutputActions', {'GlobalTimerTrig', 1, CenterLight, 255});
+    'StateChangeConditions', {'Tup', 'Sampling',...
+                              'GlobalTimer1_End', 'StillSampling'},...
+    'OutputActions', {'GlobalTimerTrig', 1});
 
+SamplingAction = {};
+switch TaskParameters.GUIMeta.Stimulus.String{TaskParameters.GUI.Stimulus}
+    case 'None' % no adjustmnet needed
+        
+    case 'DelayDuration'
+        if isfield(BpodSystem.ModuleUSB, 'HiFi1')
+            SamplingAction = {'HiFi1', ['P' 4]};
+        elseif isfield(BpodSystem.ModuleUSB, 'WavePlayer1')
+            SamplingAction = {'WavePlayer1', ['P' 4]};
+        elseif BpodSystem.EmulatorMode
+            disp('BpodSystem is in EmulatorMode. No Sampling Stimulus for DelayDuration is played.');
+        else
+            disp('Neither HiFi nor analog module is setup. No Sampling Stimulus for DelayDuration is played.');
+        end
+        
+    case 'EndBeep'
+        if isfield(BpodSystem.ModuleUSB, 'HiFi1')
+            SamplingAction = {'HiFi1', ['P' 4]};
+        elseif isfield(BpodSystem.ModuleUSB, 'WavePlayer1')
+            SamplingAction = {'WavePlayer1', ['P' 4]};
+        elseif BpodSystem.EmulatorMode
+            disp('BpodSystem is in EmulatorMode. No Sampling EndBeep is played.');
+        else
+            disp('Neither HiFi nor analog module is setup. No Sampling EndBeep is played.');
+        end
+        
+end
 sma = AddState(sma, 'Name', 'Sampling',...
-    'Timer', TaskParameters.GUI.SampleTime,...
-    'StateChangeConditions', {CenterPortOut, 'GracePeriod',...
+    'Timer', TaskParameters.GUI.SamplingTarget,...
+    'StateChangeConditions', {CenterPortOut, 'SamplingGrace',...
                               'Tup', 'StillSampling',...
                               'GlobalTimer1_End', 'StillSampling'},...
-    'OutputActions', [StimStartOutput {CenterLight,255}]);
+    'OutputActions', SamplingAction);
 
-sma = AddState(sma, 'Name', 'GracePeriod',...
-    'Timer', TaskParameters.GUI.GracePeriod,...
+sma = AddState(sma, 'Name', 'SamplingGrace',...
+    'Timer', TaskParameters.GUI.SamplingGrace,...
     'StateChangeConditions', {CenterPortIn, 'Sampling',...
                               'Tup', 'EarlyWithdrawal',...
-                              'GlobalTimer1_End', 'EarlyWithdrawal',...
-                              LeftPortIn, 'EarlyWithdrawal',...
-                              RightPortIn, 'EarlyWithdrawal'},...
-    'OutputActions', {CenterLight, 255});
+                              'GlobalTimer1_End', 'BrokeFixation',...
+                              LeftPortIn, 'BrokeFixation',...
+                              RightPortIn, 'BrokeFixation'},...
+    'OutputActions', {});
+
+BrokeFixationAction = {};
+switch TaskParameters.GUIMeta.BrokeFixationFeedback.String{TaskParameters.GUI.BrokeFixationFeedback}
+    case 'None' % no adjustmnet needed
+        
+    case 'WhiteNoise'
+        if isfield(BpodSystem.ModuleUSB, 'HiFi1')
+            BrokeFixationAction = {'HiFi1', ['P' 0]};
+        elseif isfield(BpodSystem.ModuleUSB, 'WavePlayer1')
+            BrokeFixationAction = {'WavePlayer1', ['P' 0]};
+        elseif BpodSystem.EmulatorMode
+            disp('BpodSystem is in EmulatorMode. No BrokeFixation WhiteNoise is played.');
+        else
+            disp('Neither HiFi nor analog module is setup. No BrokeFixation WhiteNoise is played.');
+        end
+        
+end
+sma = AddState(sma, 'Name', 'BrokeFixation',...
+    'Timer', TaskParameters.GUI.BrokeFixationTimeOut,...
+    'StateChangeConditions', {'Tup', 'ITI'},...
+    'OutputActions', BrokeFixationAction);
 
 %% light guided task
 LeftLightValue = 255;
@@ -304,11 +332,6 @@ sma = AddState(sma, 'Name', 'water_RJackpot',...
     'Timer', RightValveTimeJackpot,...
     'StateChangeConditions', {'Tup','DrinkingR'},...
     'OutputActions', {'ValveState', RightValve});
-
-sma = AddState(sma, 'Name', 'EarlyWithdrawal',...
-    'Timer', TaskParameters.GUI.EarlyWithdrawalTimeOut,...
-    'StateChangeConditions', {'Tup', 'ITI'},...
-    'OutputActions', EarlyWithdrawalAction);
 
 IncorrectChoiceAction = {};
 if TaskParameters.GUI.LightGuided

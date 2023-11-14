@@ -53,10 +53,10 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.SamplingTargetIncrStepSize = 0.01; % step size for autoincrementing stimulus delay time, for AutoIncr only
     TaskParameters.GUI.SamplingTargetDecrStepSize = 0.005;
     
-    TaskParameters.GUI.EarlyWithdrawalTimeOut = 3; % (s), penalty for C_out before stimulus starts
-    TaskParameters.GUI.EarlyWithdrawalFeedback = 2; % feedback for BrokeFixation
-    TaskParameters.GUIMeta.EarlyWithdrawalFeedback.Style = 'popupmenu';
-    TaskParameters.GUIMeta.EarlyWithdrawalFeedback.String = {'None', 'WhiteNoise'};
+    TaskParameters.GUI.BrokeFixationTimeOut = 3; % (s), penalty for C_out before stimulus starts
+    TaskParameters.GUI.BrokeFixationFeedback = 2; % feedback for BrokeFixation
+    TaskParameters.GUIMeta.BrokeFixationFeedback.Style = 'popupmenu';
+    TaskParameters.GUIMeta.BrokeFixationFeedback.String = {'None', 'WhiteNoise'};
     
     TaskParameters.GUI.SamplingGrace = 0;
 
