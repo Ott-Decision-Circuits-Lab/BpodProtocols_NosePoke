@@ -85,8 +85,48 @@ switch Mode
         SkippedFeedbackSound = [];
 
     case 'TrialDependent'
-        %%
+        %% (CURRENTLY ONLY FOR LEARNING TO WAIT, NOT CLICKS)
         SoundIndex = 5;
+        SamplingSound = [];
+        if isfield(TaskParameters.GUI, 'SamplingTarget') && TaskParameters.GUI.SamplingTarget > 0
+            switch TaskParameters.GUIMeta.Stimulus.String{TaskParameters.GUI.Stimulus}
+                case 'None' % no adjustment
+
+                case 'DelayDuration' % full pure tone (1 kHz) to indicate how long to wait
+                    SamplingSound = GenerateRiskCue(fs, SamplingTarget, 'Freq', 1, 1);
+
+                case 'EndBeep' % pure tone (1 kHz) 0.05s before the target sampling time reached
+                    SamplingSound = GenerateRiskCue(fs, SamplingTarget, 'Freq', 1, 1);
+                    LastIdx = max(1, length(SamplingSound)-50);
+                    SamplingSound(1:LastIdx) = 0;
+
+            end
+        end
+
+        if ~isempty(SamplingSound)
+            if isfield(BpodSystem.ModuleUSB, 'WavePlayer1')
+                Player.loadWaveform(SoundIndex, SamplingSound);
+                if TaskParameters.GUI.SingleSidePoke
+                    if BpodSystem.Data.Custom.LightLeft(iTrial) == 0
+                        Player.TriggerProfiles(SoundIndex, 2) = SoundIndex;
+                    elseif BpodSystem.Data.Custom.LightLeft(iTrial) == 1
+                        Player.TriggerProfiles(SoundIndex, 1) = SoundIndex;
+                    end
+                else
+                    Player.TriggerProfiles(SoundIndex, 1:2) = SoundIndex;
+                end
+            elseif isfield(BpodSystem.ModuleUSB, 'HiFi1')
+                if TaskParameters.GUI.SingleSidePoke
+                    if BpodSystem.Data.Custom.LightLeft(iTrial) == 0
+                        Player.load(SoundIndex, [0; SamplingSound]);
+                    elseif BpodSystem.Data.Custom.LightLeft(iTrial) == 1
+                        Player.load(SoundIndex, [SamplingSound; 0]);
+                    end
+                else
+                    Player.load(SoundIndex, SamplingSound);
+                end
+            end
+        end
 
 end % end switch
 end % end function
