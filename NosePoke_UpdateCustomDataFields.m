@@ -9,7 +9,7 @@ raw_events = BpodSystem.Data.RawEvents;
 trial_states = raw_events.Trial{iTrial}.States;
 TrialData = BpodSystem.Data.Custom.TrialData;
 
-BpodSystem.Data.TrialTypes(iTrial)=1;
+BpodSystem.Data.TrialTypes(iTrial) = 1;
 
 %% OutcomeRecord
 

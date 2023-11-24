@@ -54,7 +54,7 @@ TrialData.CenterPortRewarded(iTrial) = NaN;
 
 %% Peri-decision and pre-outcome
 TrialData.LightLeft(iTrial) = NaN; % if true, 1-arm bandit with left poke being correct
-if TaskParameters.GUI.SingleSidePoke
+if TaskParameters.GUI.SingleSidePoke && ~TaskParameters.GUI.BiasControlDepletion
     TrialData.LightLeft(iTrial) = rand < 0.5;
 end
 
@@ -67,11 +67,13 @@ TrialData.IncorrectChoice(iTrial) = NaN; % True if the choice is incorrect (only
 % basically = LigthLeft & ChoiceLeft; doesn't necessary in the state of
 % IncorrectChoice (may end up in SkippedFeedback first)
 
-if iTrial == 1
-    TrialData.FeedbackDelay(iTrial) = TaskParameters.GUI.FeedbackDelayMean;
-else
-    TrialData.FeedbackDelay(iTrial) = abs(randn(1,1) * TaskParameters.GUI.FeedbackDelaySigma + TaskParameters.GUI.FeedbackDelayMean);
+try
+    TrialData.FeedbackDelay(iTrial) = TruncatedExponential(TaskParameters.GUI.FeedbackDelayMin, TaskParameters.GUI.FeedbackDelayMax, TaskParameters.GUI.FeedbackDelayTau);
+catch
+    TrialData.FeedbackDelay(iTrial) = 0;
+    disp('Error in TruncatedExponential, probably wrong parameters for FeedbackDelay')
 end
+TaskParameters.GUI.FeedbackDelay = TrialData.FeedbackDelay(iTrial);
 
 TrialData.FeedbackGrace(1, iTrial) = NaN; % first index for the number of time the state is entered
 TrialData.FeedbackWaitingTime(iTrial) = NaN; % Time spend to wait for feedback
@@ -82,6 +84,16 @@ TrialData.TITrial(iTrial) = NaN; % True if it is included in TimeInvestment
 %% Peri-outcome
 % Reward Magnitude in different situations
 if TaskParameters.GUI.BiasControlDepletion
+    if TaskParameters.GUI.RewardProb ~= 1
+        TaskParameters.GUI.RewardProb = 1;
+        disp('BiasControlDepletion is on, RewardProb will set to 1.')
+    end
+
+    if TaskParameters.GUI.SingleSidePoke
+        TaskParameters.GUI.SingleSidePoke = 0;
+        disp('BiasControlDepletion is on, SingleSidePoke will set to false.')
+    end
+
     TrialData.RewardMagnitude(:, iTrial) = TaskParameters.GUI.RewardAmount * ones(2,1);
     if iTrial > 1
         %{

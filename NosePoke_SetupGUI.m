@@ -13,6 +13,9 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.Ports_LMR = '123';
     TaskParameters.GUI.EphysSession = false;
     TaskParameters.GUIMeta.EphysSession.Style = 'checkbox';
+    TaskParameters.GUI.Wire1VideoTrigger = 1;
+    TaskParameters.GUIMeta.Wire1VideoTrigger.Style = 'popupmenu';
+    TaskParameters.GUIMeta.Wire1VideoTrigger.String = {'None', 'Investment', 'All'};
 
     TaskParameters.GUI.PreITI = 1.5;
     TaskParameters.GUI.WaitCInMax = 15; % max waiting time for C_in before a new trial starts, useful to track progress
@@ -34,6 +37,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUIMeta.VI.Style = 'checkbox';
     
     TaskParameters.GUIPanels.General = {'SessionDescription', 'Ports_LMR', 'EphySession',...
+                                        'Wire1VideoTrigger',...
                                         'PreITI', 'WaitCinMax', 'ChoiceDeadline',...
                                         'NoDecisionTimeOut', 'NoDecisionFeedback',...
                                         'SingleSidePoke',...
@@ -104,11 +108,29 @@ if isempty(fieldnames(TaskParameters))
 %         'RandomRewardProb', 'RandomRewardMultiplier',...
 %         'Jackpot','JackpotMin','JackpotTime', 'DrinkingTime',...
     
-    % Feedback Delay
-    TaskParameters.GUI.FeedbackDelayMean = 0;
-    TaskParameters.GUI.FeedbackDelaySigma = 0;
-    TaskParameters.GUI.FeedbackDelayGrace = 0.3;
-    TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelayMean', 'FeedbackDelaySigma', 'FeedbackDelayGrace'};
+    %% Feedback Delay
+    TaskParameters.GUI.FeedbackDelay = 0;
+    TaskParameters.GUIMeta.FeedbackDelay.Style = 'text';
+    
+    TaskParameters.GUI.FeedbackDelayTau = 0;
+    TaskParameters.GUI.FeedbackDelayMin = 0;
+    TaskParameters.GUI.FeedbackDelayMax = 8;
+    TaskParameters.GUI.FeedbackDelayGrace = 0.2;
+
+    TaskParameters.GUI.SkippedFeedbackTimeOut = 0;
+    TaskParameters.GUI.SkippedFeedbackFeedback = 1; % feedback for SkippedFeedback
+    TaskParameters.GUIMeta.SkippedFeedbackFeedback.Style = 'popupmenu';
+    TaskParameters.GUIMeta.SkippedFeedbackFeedback.String = {'None', 'WhiteNoise', 'Beep'};
+    
+    TaskParameters.GUI.NotBaitedTimeOut = 0.10;
+    TaskParameters.GUI.NotBaitedFeedback = 1; % feedback for SkippedFeedback
+    TaskParameters.GUIMeta.NotBaitedFeedback.Style = 'popupmenu';
+    TaskParameters.GUIMeta.NotBaitedFeedback.String = {'None', 'WhiteNoise', 'Beep'};
+
+    TaskParameters.GUIPanels.FeedbackDelay = {'FeedbackDelay', 'FeedbackDelayTau', 'FeedbackDelayMin',...
+                                              'FeedbackDelayMax', 'FeedbackDelayGrace',...
+                                              'SkippedFeedbackTimeOut', 'SkippedFeedbackFeedback',...
+                                              'NotBaitedTimeOut', 'NotBaitedFeedback'};
     
     %% Photometry
     % Photometry General

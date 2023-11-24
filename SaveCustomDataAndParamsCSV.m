@@ -11,7 +11,7 @@ global BpodSystem
 
 n_trials = BpodSystem.Data.nTrials;
 
-trial_data = BpodSystem.Data.Custom.TrialData;
+TrialData = BpodSystem.Data.Custom.TrialData;
 
 %{
 ---------------------------------------------------------------------------
@@ -27,25 +27,25 @@ dimensions)
 data_table = table();
 
 % ---------------------Sample and Choice variables-------------------- %
-data_table.EarlyWithdrawal = trial_data.EarlyWithdrawal(1:n_trials).';
-data_table.sample_length = trial_data.sample_length(1:n_trials).';
-data_table.ChoiceLeft = trial_data.ChoiceLeft(1:n_trials).';
-data_table.move_time = trial_data.move_time(1:n_trials).';
-data_table.port_entry_delay = trial_data.port_entry_delay(1:n_trials).';
+data_table.EarlyWithdrawal = TrialData.EarlyWithdrawal(1:n_trials).';
+data_table.sample_length = TrialData.sample_length(1:n_trials).';
+data_table.ChoiceLeft = TrialData.ChoiceLeft(1:n_trials).';
+data_table.move_time = TrialData.move_time(1:n_trials).';
+data_table.port_entry_delay = TrialData.port_entry_delay(1:n_trials).';
 
 
 % -----------------------Reward variables------------------------------ %
-data_table.Correct = trial_data.Correct(1:n_trials).';
-data_table.Rewarded = trial_data.Rewarded(1:n_trials).';
-data_table.RewardAvailable = trial_data.RewardAvailable(1:n_trials).';
-data_table.RewardDelay = trial_data.RewardDelay(1:n_trials).';
-data_table.LeftRewardMagnitude = trial_data.RewardMagnitude(1, :);
-data_table.RightRewardMagnitude = trial_data.RewardMagnitude(2, :);
+data_table.Correct = TrialData.Correct(1:n_trials).';
+data_table.Rewarded = TrialData.Rewarded(1:n_trials).';
+data_table.RewardAvailable = TrialData.RewardAvailable(1:n_trials).';
+data_table.RewardDelay = TrialData.RewardDelay(1:n_trials).';
+data_table.LeftRewardMagnitude = TrialData.RewardMagnitude(1, :);
+data_table.RightRewardMagnitude = TrialData.RewardMagnitude(2, :);
 
 
 % -------------------------Misc variables------------------------------ %
-data_table.RandomThresholdPassed = trial_data.RandomThresholdPassed(1:n_trials).';
-data_table.LightLeft = trial_data.LightLeft(1:n_trials).';
+data_table.RandomThresholdPassed = TrialData.RandomThresholdPassed(1:n_trials).';
+data_table.LightLeft = TrialData.LightLeft(1:n_trials).';
 
 
 % ----------------------------Params----------------------------------- %

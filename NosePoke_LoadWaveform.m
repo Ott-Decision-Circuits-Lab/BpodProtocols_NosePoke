@@ -3,7 +3,8 @@ function NosePoke_LoadWaveform(Player, Mode, iTrial)
 % NoDecisionSound      -> 2
 % IncorrectChoiceSound -> 3
 % SkippedFeedbackSound -> 4 (Not implement yet}
-% Sound Index 5 onwards are reserved for trial-dependent waveform (Max index for HiFi: 20; for Analog: 64)
+% NotBaitedFeedbackSound -> 5 (Not implement yet}
+% Sound Index 6 onwards are reserved for trial-dependent waveform (Max index for HiFi: 20; for Analog: 64)
 
 global BpodSystem
 global TaskParameters
@@ -80,13 +81,59 @@ switch Mode
             end
         end
         
-        %% (NOT IMPLEMENT YET)
+        %%
         SoundIndex = 4;
         SkippedFeedbackSound = [];
+        if isfield(TaskParameters.GUI, 'SkippedFeedbackTimeOut') && TaskParameters.GUI.SkippedFeedbackTimeOut > 0
+            switch TaskParameters.GUIMeta.SkippedFeedbackFeedback.String{TaskParameters.GUI.SkippedFeedbackFeedback}
+                case 'None' % no adjustment
+
+                case 'WhiteNoise'
+                    SkippedFeedbackSound = rand(1, fs*TaskParameters.GUI.SkippedFeedbackTimeOut)*2 - 1;
+
+                case 'Beep' % 1k Hz
+                    SkippedFeedbackSound = GenerateRiskCue(fs, TaskParameters.GUI.SkippedFeedbackTimeOut, 'Freq', 1, 1);
+                    
+            end
+        end
+
+        if ~isempty(SkippedFeedbackSound)
+            if isfield(BpodSystem.ModuleUSB, 'WavePlayer1')
+                Player.loadWaveform(SoundIndex, SkippedFeedbackSound);
+                Player.TriggerProfiles(SoundIndex, 1:2) = SoundIndex;
+            elseif isfield(BpodSystem.ModuleUSB, 'HiFi1')
+                Player.load(SoundIndex, SkippedFeedbackSound);
+            end
+        end
+
+        %%
+        SoundIndex = 5;
+        NotBaitedSound = [];
+        if isfield(TaskParameters.GUI, 'NotBaitedTimeOut') && TaskParameters.GUI.NotBaitedTimeOut > 0
+            switch TaskParameters.GUIMeta.NotBaitedFeedback.String{TaskParameters.GUI.NotBaitedFeedback}
+                case 'None' % no adjustment
+
+                case 'WhiteNoise'
+                    NotBaitedSound = rand(1, fs*TaskParameters.GUI.NotBaitedTimeOut)*2 - 1;
+
+                case 'Beep' % 0.5k Hz
+                    NotBaitedSound = GenerateRiskCue(fs, TaskParameters.GUI.NotBaitedTimeOut, 'Freq', 0.5, 0.5);
+
+            end
+        end
+
+        if ~isempty(NotBaitedSound)
+            if isfield(BpodSystem.ModuleUSB, 'WavePlayer1')
+                Player.loadWaveform(SoundIndex, NotBaitedSound);
+                Player.TriggerProfiles(SoundIndex, 1:2) = SoundIndex;
+            elseif isfield(BpodSystem.ModuleUSB, 'HiFi1')
+                Player.load(SoundIndex, NotBaitedSound);
+            end
+        end
 
     case 'TrialDependent'
         %% (CURRENTLY ONLY FOR LEARNING TO WAIT, NOT CLICKS)
-        SoundIndex = 5;
+        SoundIndex = 6;
         SamplingSound = [];
         if isfield(TaskParameters.GUI, 'SamplingTarget') && TaskParameters.GUI.SamplingTarget > 0
             switch TaskParameters.GUIMeta.Stimulus.String{TaskParameters.GUI.Stimulus}
