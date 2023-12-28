@@ -1,9 +1,9 @@
 function NosePoke_LoadWaveform(Player, Mode, iTrial)
-% EarlyWithdrawalSound -> Sound Index 1
+% BrokeFixationSound -> Sound Index 1
 % NoDecisionSound      -> 2
 % IncorrectChoiceSound -> 3
-% SkippedFeedbackSound -> 4 (Not implement yet}
-% NotBaitedFeedbackSound -> 5 (Not implement yet}
+% SkippedFeedbackSound -> 4
+% NotBaitedFeedbackSound -> 5
 % Sound Index 6 onwards are reserved for trial-dependent waveform (Max index for HiFi: 20; for Analog: 64)
 
 global BpodSystem

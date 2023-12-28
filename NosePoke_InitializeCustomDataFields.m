@@ -12,7 +12,7 @@ end
 
 TrialData = BpodSystem.Data.Custom.TrialData;
 
-%% Pre-stimulus delivery
+%% Peri-trial initiation
 TrialData.NoTrialStart(iTrial) = true; % true = no state StartCIn; false = with state StartCIn.
 TrialData.TimeCenterPoke(iTrial) = NaN; % Time when CIn
 
@@ -48,7 +48,7 @@ TrialData.SamplingTime(iTrial) = NaN; % Time that stayed CenterPortIn for Sampli
 TrialData.SamplingGrace(1,iTrial) = NaN; % old GracePeriod, row is for the n-th time the state is entered, column is for the time in this State
 TrialData.BrokeFixation(iTrial) = NaN; % NaN = no state StartCIn; true = with state BrokeFixation; false = with state Sampling
 
-TrialData.CenterPortBaited(iTrial) = TaskParameters.GUI.CenterPortProb > rand;
+TrialData.CenterPortBaited(iTrial) = TaskParameters.GUI.CenterPortProb >= rand;
 TrialData.CenterPortRewardAmount(iTrial) = TaskParameters.GUI.CenterPortRewardAmount * TrialData.CenterPortBaited(iTrial);
 TrialData.CenterPortRewarded(iTrial) = NaN;
 
@@ -84,15 +84,11 @@ TrialData.TITrial(iTrial) = NaN; % True if it is included in TimeInvestment
 %% Peri-outcome
 % Reward Magnitude in different situations
 if TaskParameters.GUI.BiasControlDepletion
-    if TaskParameters.GUI.RewardProb ~= 1
-        TaskParameters.GUI.RewardProb = 1;
-        disp('BiasControlDepletion is on, RewardProb will set to 1.')
-    end
+    TaskParameters.GUI.RewardProb = 1;
+    disp('BiasControlDepletion is on, RewardProb will set to 1.')
 
-    if TaskParameters.GUI.SingleSidePoke
-        TaskParameters.GUI.SingleSidePoke = 0;
-        disp('BiasControlDepletion is on, SingleSidePoke will set to false.')
-    end
+    TaskParameters.GUI.SingleSidePoke = 0;
+    disp('BiasControlDepletion is on, SingleSidePoke will set to false.')
 
     TrialData.RewardMagnitude(:, iTrial) = TaskParameters.GUI.RewardAmount * ones(2,1);
     if iTrial > 1

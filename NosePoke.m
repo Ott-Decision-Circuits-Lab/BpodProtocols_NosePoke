@@ -13,16 +13,25 @@ if ~BpodSystem.EmulatorMode % Sound/laser waveform generation is not compulsory 
     if ~isfield(BpodSystem.ModuleUSB, 'WavePlayer1') && ~isfield(BpodSystem.ModuleUSB, 'HiFi1')
         disp('Warning: To run this protocol with sound or laser, you will need to pair an Analog Output Module or a HiFi Module(hardware) with its USB port. Click the USB config button on the Bpod console.')
     else
+        Player = [];
+        Laser = [];
         if isfield(BpodSystem.ModuleUSB, 'HiFi1')
             [Player, ~] = SetupHiFi(192000); % 192kHz = max sampling rate
         end
         
-        ChannelNumber = 4;
+        ChannelNumber = 4; % sound in Analogue Output module is always channel 1 & 2; laser is always channel 3 & 4
         if isfield(BpodSystem.ModuleUSB, 'WavePlayer1')
-            [Player, ~] = SetupWavePlayer(ChannelNumber); % 25kHz = sampling rate of 8Ch with 8Ch fully on; 50kHz for 4Ch; 100kHZ for 2Ch
+            if isempty(Player)
+                [Player, ~] = SetupWavePlayer(ChannelNumber); % 25kHz = sampling rate of 8Ch with 8Ch fully on; 50kHz for 4Ch; 100kHZ for 2Ch
+            else
+                [Laser, ~] = SetupWavePlayer(ChannelNumber); % 25kHz = sampling rate of 8Ch with 8Ch fully on; 50kHz for 4Ch; 100kHZ for 2Ch
+            end
         end
+
         NosePoke_LoadWaveform(Player, 'TrialIndependent'); %Taking the last Player for now as the WaveformPlayer
     end
+else
+    disp('Warning: Sound or laser will not be played in emulator mode.')
 end
 
 %% set up photometry module
