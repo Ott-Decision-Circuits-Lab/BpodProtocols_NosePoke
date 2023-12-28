@@ -20,7 +20,7 @@ TrialData.SamplingTarget(iTrial) = TaskParameters.GUI.SamplingTarget;
 if TaskParameters.GUI.AutoIncrSamplingTarget
     if iTrial > 1
         History = 50; % Rat: History = 50
-        Crit = 0.6; % Rat: Crit = 0.6
+        Crit = 0.6; % Rat: Crit = 0.8 originally, reduced to speed up
         ConsiderTrials = max(1,iTrial-History):1:iTrial-1;
         ConsiderTrials = ConsiderTrials(~isnan(TrialData.BrokeFixation(ConsiderTrials))); % exclude trials did not start
         NotBrokeFixationRate = sum(~TrialData.BrokeFixation(ConsiderTrials))/length(ConsiderTrials);
@@ -79,16 +79,13 @@ TrialData.FeedbackGrace(1, iTrial) = NaN; % first index for the number of time t
 TrialData.FeedbackWaitingTime(iTrial) = NaN; % Time spend to wait for feedback
 TrialData.TimeSkippedFeedback(iTrial) = NaN;
 TrialData.SkippedFeedback(iTrial) = NaN; % True if SkippedFeedback
-TrialData.TITrial(iTrial) = NaN; % True if it is included in TimeInvestment
 
 %% Peri-outcome
 % Reward Magnitude in different situations
 if TaskParameters.GUI.BiasControlDepletion
     TaskParameters.GUI.RewardProb = 1;
-    disp('BiasControlDepletion is on, RewardProb will set to 1.')
-
+    TrialData.Baited(:, iTrial) = rand(2,1) < TaskParameters.GUI.RewardProb;
     TaskParameters.GUI.SingleSidePoke = 0;
-    disp('BiasControlDepletion is on, SingleSidePoke will set to false.')
 
     TrialData.RewardMagnitude(:, iTrial) = TaskParameters.GUI.RewardAmount * ones(2,1);
     if iTrial > 1
@@ -108,6 +105,9 @@ if TaskParameters.GUI.BiasControlDepletion
         elseif isnan(TrialData.ChoiceLeft(iTrial-1))
             TrialData.RewardMagnitude(:, iTrial) = TrialData.RewardMagnitude(:, iTrial-1);
         end
+    else
+        disp('BiasControlDepletion is on, RewardProb will set to 1.')
+        disp('BiasControlDepletion is on, SingleSidePoke will set to false.')
     end
 else
     TrialData.Baited(:, iTrial) = rand(2,1) < TaskParameters.GUI.RewardProb;
