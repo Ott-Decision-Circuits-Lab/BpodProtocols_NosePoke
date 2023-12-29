@@ -116,7 +116,8 @@ else
     elseif TrialData.LightLeft(iTrial) == 0
         TrialData.Baited(1, iTrial) = 0;
     end
-    TrialData.RewardMagnitude(:, iTrial) = TrialData.RewardMagnitude(:, iTrial).* TrialData.Baited(:, iTrial);
+    
+    TrialData.RewardMagnitude(:, iTrial) = TaskParameters.GUI.RewardAmount * TrialData.Baited(:, iTrial);
 end
 
 TrialData.RewardMagnitudeL(iTrial) = TrialData.RewardMagnitude(1, iTrial);

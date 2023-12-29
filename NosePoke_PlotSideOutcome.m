@@ -238,7 +238,7 @@ switch Action
             ndxSkippedFeedbackLeft = SkippedFeedback(indxToPlot) == 1 & ChoiceLeft(indxToPlot) == 1;
             ndxSkippedFeedbackRight = SkippedFeedback(indxToPlot) == 1 & ChoiceLeft(indxToPlot) == 0;
             XData = [indxToPlot(ndxSkippedFeedbackLeft), indxToPlot(ndxSkippedFeedbackRight)];
-            YData = [ones(1, indxToPlot(ndxSkippedFeedbackLeft)), zeros(2, indxToPlot(ndxSkippedFeedbackRight))];
+            YData = [ones(1, sum(ndxSkippedFeedbackLeft)), zeros(1, sum(ndxSkippedFeedbackRight))];
             set(BpodSystem.GUIHandles.OutcomePlot.SkippedFeedback,...
                 'xdata', XData,...
                 'ydata', YData);
