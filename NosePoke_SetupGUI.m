@@ -48,7 +48,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUI.AutoIncrSamplingTarget = 1;
     TaskParameters.GUIMeta.AutoIncrSamplingTarget.Style = 'checkbox';
     
-    TaskParameters.GUI.SamplingTargetMin = 0.01;
+    TaskParameters.GUI.SamplingTargetMin = 0.1;
     TaskParameters.GUI.SamplingTargetMax = 0.8;
     
     TaskParameters.GUI.SamplingTarget = TaskParameters.GUI.SamplingTargetMin; % current stimulus delay time
@@ -205,7 +205,7 @@ if isempty(fieldnames(TaskParameters))
     TaskParameters.GUITabs.Photometry = {'PhotometryRecording', 'PhotometryNidaq', 'PhotometryPlot', 'PhotometryRig'};
        
     TaskParameters.GUI = orderfields(TaskParameters.GUI);
-    TaskParameters.Figures.OutcomePlot.Position = [50, 50, 1000, 400];
+    TaskParameters.Figures.OutcomePlot.Position = [100, 100, 800, 600];
 end
 BpodParameterGUI('init', TaskParameters);
 

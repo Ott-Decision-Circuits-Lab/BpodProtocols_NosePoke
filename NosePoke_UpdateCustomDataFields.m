@@ -48,7 +48,7 @@ if any(strcmp('Sampling', StatesThisTrial))
         SamplingEnd = TrialStates.Sampling(end,end);
     elseif any(strcmp('StillSampling', StatesThisTrial))
         SamplingEnd = TrialStates.StillSampling(1,2);
-    elseif any(strcmp('BrokenFixation', StatesThisTrial))
+    elseif any(strcmp('BrokeFixation', StatesThisTrial))
         SamplingEnd = TrialStates.SamplingGrace(end,end); 
     end
     TrialData.SamplingTime(iTrial) = SamplingEnd - SamplingBegin;
