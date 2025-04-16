@@ -13,11 +13,14 @@ if ~BpodSystem.EmulatorMode % Sound/laser waveform generation is not compulsory 
     if ~isfield(BpodSystem.ModuleUSB, 'WavePlayer1') && ~isfield(BpodSystem.ModuleUSB, 'HiFi1')
         disp('Warning: To run this protocol with sound or laser, you will need to pair an Analog Output Module or a HiFi Module(hardware) with its USB port. Click the USB config button on the Bpod console.')
     else
-        Player = [];
+        BpodSystem.assertModule('HiFi', 1);
+        Player = BpodHiFi(BpodSystem.ModuleUSB.HiFi1);
+        Player.SamplingRate = 192000;
+        Player.DigitalAttenuation_dB = -45;
         Laser = [];
-        if isfield(BpodSystem.ModuleUSB, 'HiFi1')
-            [Player, ~] = SetupHiFi(192000); % 192kHz = max sampling rate
-        end
+%         if isfield(BpodSystem.ModuleUSB, 'HiFi1')
+%             [Player, ~] = SetupHiFi(192000); % 192kHz = max sampling rate
+%         end
         
         ChannelNumber = 4; % sound in Analogue Output module is always channel 1 & 2; laser is always channel 3 & 4
         if isfield(BpodSystem.ModuleUSB, 'WavePlayer1')

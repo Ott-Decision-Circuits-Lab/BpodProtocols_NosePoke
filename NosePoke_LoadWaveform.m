@@ -13,10 +13,10 @@ if nargin < 3
     iTrial = 0;
 end
 
+SoundLevel = 0.05;
+
 % load auditory stimuli
 fs = Player.SamplingRate;
-
-SoundLevel = 0.1;
 
 switch Mode
     case 'TrialIndependent'
@@ -179,6 +179,7 @@ switch Mode
                 else
                     Player.load(SoundIndex, SamplingSound);
                 end
+                Player.push()
             end
         end
 
