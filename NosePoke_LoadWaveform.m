@@ -16,6 +16,8 @@ end
 % load auditory stimuli
 fs = Player.SamplingRate;
 
+SoundLevel = 0.1;
+
 switch Mode
     case 'TrialIndependent'
         %%
@@ -27,6 +29,7 @@ switch Mode
 
                 case 'WhiteNoise'
                     BrokeFixationSound = rand(1, fs*TaskParameters.GUI.BrokeFixationTimeOut)*2 - 1;
+                    BrokeFixationSound = BrokeFixationSound*SoundLevel;
             end
         end
 
@@ -48,6 +51,7 @@ switch Mode
 
                 case 'WhiteNoise'
                     NoDecisionSound = rand(1, fs*TaskParameters.GUI.NoDecisionTimeOut)*2 - 1;
+                    NoDecisionSound = NoDecisionSound*SoundLevel;
             end
         end
 
@@ -69,6 +73,7 @@ switch Mode
 
                 case 'WhiteNoise'
                     IncorrectChoiceSound = rand(1, fs*TaskParameters.GUI.IncorrectChoiceTimeOut)*2 - 1;
+                    IncorrectChoiceSound = IncorrectChoiceSound*SoundLevel;
             end
         end
 
@@ -90,6 +95,7 @@ switch Mode
 
                 case 'WhiteNoise'
                     SkippedFeedbackSound = rand(1, fs*TaskParameters.GUI.SkippedFeedbackTimeOut)*2 - 1;
+                    SkippedFeedbackSound = SkippedFeedbackSound*SoundLevel;
 
                 case 'Beep' % 1k Hz
                     SkippedFeedbackSound = GenerateRiskCue(fs, TaskParameters.GUI.SkippedFeedbackTimeOut, 'Freq', 1, 1);
@@ -115,6 +121,7 @@ switch Mode
 
                 case 'WhiteNoise'
                     NotBaitedSound = rand(1, fs*TaskParameters.GUI.NotBaitedTimeOut)*2 - 1;
+                    NotBaitedSound = NotBaitedSound*SoundLevel;
 
                 case 'Beep' % 0.5k Hz
                     NotBaitedSound = GenerateRiskCue(fs, TaskParameters.GUI.NotBaitedTimeOut, 'Freq', 0.5, 0.5);
