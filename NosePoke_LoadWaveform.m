@@ -13,7 +13,7 @@ if nargin < 3
     iTrial = 0;
 end
 
-SoundLevel = 0.05;
+SoundLevel = 0.2;
 
 % load auditory stimuli
 fs = Player.SamplingRate;
@@ -136,6 +136,10 @@ switch Mode
             elseif isfield(BpodSystem.ModuleUSB, 'HiFi1')
                 Player.load(SoundIndex, NotBaitedSound);
             end
+        end
+
+        if isfield(BpodSystem.ModuleUSB, 'HiFi1')
+            Player.push()
         end
 
     case 'TrialDependent'

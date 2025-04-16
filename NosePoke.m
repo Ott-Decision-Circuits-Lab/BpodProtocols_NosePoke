@@ -16,7 +16,7 @@ if ~BpodSystem.EmulatorMode % Sound/laser waveform generation is not compulsory 
         BpodSystem.assertModule('HiFi', 1);
         Player = BpodHiFi(BpodSystem.ModuleUSB.HiFi1);
         Player.SamplingRate = 192000;
-        Player.DigitalAttenuation_dB = -45;
+        Player.DigitalAttenuation_dB = -25;
         Laser = [];
 %         if isfield(BpodSystem.ModuleUSB, 'HiFi1')
 %             [Player, ~] = SetupHiFi(192000); % 192kHz = max sampling rate
