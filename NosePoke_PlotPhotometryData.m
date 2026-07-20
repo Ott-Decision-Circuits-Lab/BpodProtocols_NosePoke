@@ -10,7 +10,7 @@ if TaskParameters.GUI.Photometry
         
     Alignments = {[],[],[],[]};
     if TaskParameters.GUI.SidePokeIn && BpodSystem.Data.Custom.TrialData.BrokeFixation(iTrial) == 0
-        Alignments{1} = 'wait_Sin';
+        Alignments{1} = 'WaitCIn';
     end
     if TaskParameters.GUI.SidePokeLeave && BpodSystem.Data.Custom.TrialData.BrokeFixation(iTrial) == 0 && BpodSystem.Data.Custom.TrialData.Rewarded(iTrial)==0
         Alignments{2} = 'ITI';
